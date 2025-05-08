@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  output          = "../generated/prisma"
+ output           = "../src/generated/prisma"
   previewFeatures = ["views"]
 }
 
@@ -9,16 +9,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-view FINTITPAGCLASFAZ {
-  E2_CATEGFO String  @db.VarChar(1)
-  E2_FORNECE String  @db.VarChar(6)
-  E2_NOMFOR  String  @db.VarChar(20)
-  E2_VALOR   Float
-  MES        String? @db.VarChar(9)
-  NUMERO     Int?
-  E2_VENCREA String  @db.VarChar(8)
-  E2_VENCTO  String  @db.VarChar(8)
+view User {
+  REC         Int       @unique
+  CODIGO      String   @db.VarChar(6)
+  CGC         String   @db.VarChar(14)
+  NOME        String   @db.VarChar(50)
+  EMAIL       String   @db.VarChar(60)
+  NASCIMENTO  DateTime @db.Date
 
-  @@ignore
+  @@map("USUARIOS_MEU_PORTAL_ROMMANEL")
 }
 

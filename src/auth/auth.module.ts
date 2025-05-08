@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
@@ -10,7 +8,7 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     JwtModule.register({
-      secret: '2D]s*o?yFZQYa#T^s^Lcw+ac-Yw>4}U#',
+      secret: 'k3+R#8bZtM9!YvF$2sLp@NcDwG%Xa*H^z7qTuJrK&eBjVmW$4d',
       signOptions: { expiresIn: '60s', issuer: 'login', audience: 'users' },
     }),
     forwardRef(() => UserModule),

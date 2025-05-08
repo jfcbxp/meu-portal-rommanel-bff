@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { RoleGuard } from 'src/guards/role.guard';
 import { ParamId } from '../decorators/param-id.decorator';

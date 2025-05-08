@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
+import { User } from '../generated/prisma';
+import { AuthTokenDTO } from './dto/auth-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,15 +17,15 @@ export class AuthService {
   createToken(user: User) {
     return {
       accessToken: this.jwtService.sign({
-        sub: user.id,
-        name: user.name,
+        sub: user.REC,
+        name: user.NOME,
       }),
     };
   }
 
   checkToken(token: string) {
     try {
-      const response = this.jwtService.verify(token, {
+      const response = this.jwtService.verify<AuthTokenDTO>(token, {
         audience: 'users',
         issuer: 'login',
       });
@@ -44,7 +41,7 @@ export class AuthService {
       this.checkToken(token);
 
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -52,42 +49,15 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.prisma.user.findFirst({
       where: {
-        email,
+        EMAIL: email,
       },
     });
 
-    if (!user || !(await bcrypt.compare(password, user.password)))
-      throw new UnauthorizedException('Email e/ou senha incorretos');
+    if (!user) throw new UnauthorizedException('Usuario não encontrado');
 
-    return this.createToken(user);
-  }
+    const check = await bcrypt.compare(password, user.CGC);
 
-  async forget(email: string) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
-
-    if (!user) throw new UnauthorizedException('Email invalido');
-
-    return user;
-  }
-
-  async reset(password: string) {
-    // TODO Validar Token
-    const user = await this.prisma.user.update({
-      where: {
-        id: 0,
-      },
-      data: { password },
-    });
-
-    return this.createToken(user);
-  }
-
-  async register(data: AuthRegisterDTO) {
-    const user = await this.userService.create(data);
+    if (!check) throw new UnauthorizedException('Email e/ou senha incorretos');
 
     return this.createToken(user);
   }

@@ -31,6 +31,6 @@
   "ts-node": {
     "files": true
   },
-  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./test/**/*.ts", ".eslintignore", ".prettierrc"],
+  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./test/**/*.ts", ".eslintignore", ".prettierrc", "generated"],
   "exclude": ["./node_modules/*", "dist"]
 }
