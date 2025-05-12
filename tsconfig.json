@@ -10,12 +10,27 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "allowJs": true,
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@constants/*": ["./src/common/constants/*"],
+      "@environment/*": ["./src/common/environment/*"],
+      "@health/*": ["./src/health/*"],
+      "@activity/*": ["./src/activity/*"],
+      "@exceptions/*": ["./src/common/exceptions/*"],
+      "@contentDto/*": ["./src/content/dto/*"],
+      "@contentInterfaces/*": ["./src/content/interfaces/*"]
+    }
+  },
+  "ts-node": {
+    "files": true
+  },
+  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "./test/**/*.ts", ".eslintignore", ".prettierrc", "generated"],
+  "exclude": ["./node_modules/*", "dist"]
 }
