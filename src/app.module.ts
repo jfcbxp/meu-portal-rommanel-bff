@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { PaymentModule } from './payment/payment.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -16,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
     ]),
     forwardRef(() => UserModule),
     forwardRef(() => AuthModule),
+    forwardRef(() => PaymentModule),
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

@@ -23,7 +23,7 @@ view User {
 view Payment {
   RECE1       Int      @unique
   RECA1       Int      @db.Int
-  NMERO       String   @db.VarChar(9)
+  NUMERO      String   @db.VarChar(9)
   TIPO        String   @db.VarChar(3)
   SERIE       String   @db.VarChar(3)
   LINDIG      String   @db.VarChar(48)

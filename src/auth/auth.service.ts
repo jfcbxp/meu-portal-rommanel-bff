@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '../generated/prisma';
 import { AuthTokenDTO } from './dto/auth-token.dto';
+import { Role } from 'src/enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
         sub: user.REC,
         name: user.NOME,
         cgc: user.CGC,
+        role: Role.User,
       }),
     };
   }

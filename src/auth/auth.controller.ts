@@ -3,6 +3,7 @@ import { AuthLoginDTO } from './dto/auth-login.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { User } from '../decorators/user.decorator';
+import { AuthTokenDTO } from './dto/auth-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -19,7 +20,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('me')
-  me(@User() user: unknown) {
+  me(@User() user: AuthTokenDTO) {
     return { user };
   }
 }
