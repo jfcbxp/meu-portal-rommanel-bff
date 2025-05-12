@@ -20,3 +20,20 @@ view User {
   @@map("USUARIOS_MEU_PORTAL_ROMMANEL")
 }
 
+view Payment {
+  RECE1       Int      @unique
+  RECA1       Int      @db.Int
+  NMERO       String   @db.VarChar(9)
+  TIPO        String   @db.VarChar(3)
+  SERIE       String   @db.VarChar(3)
+  LINDIG      String   @db.VarChar(48)
+  CODBARRAS   String   @db.VarChar(44)
+  NUMBCO      String   @db.VarChar(17)
+  BORDERO     String   @db.VarChar(6)
+  EMISSAO     DateTime @db.Date
+  PAGAMENTO   DateTime @db.Date
+  VALOR       Float
+  SALDO       Float
+
+  @@map("BOLETOS_MEU_PORTAL_ROMMANEL")
+}

@@ -5,20 +5,18 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list() {
-    return await this.prisma.user.findMany({
+  async findById(id: number) {
+    return await this.prisma.user.findUnique({
       where: {
-        EMAIL: {
-          contains: '@',
-        },
+        REC: id,
       },
     });
   }
 
-  async show(id: number) {
-    return await this.prisma.user.findUnique({
+  async findByCgc(id: string) {
+    return await this.prisma.user.findFirst({
       where: {
-        REC: id,
+        CGC: id,
       },
     });
   }

@@ -12,9 +12,9 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: AuthLoginDTO) {
-    this.logger.log(`Tentando autenticar o e-mail: ${body.email}`);
+    this.logger.log(`Tentando autenticar o cgc: ${body.id}`);
 
-    return this.authService.login(body.email, body.password);
+    return this.authService.login(body.id);
   }
 
   @UseGuards(AuthGuard)

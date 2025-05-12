@@ -1,8 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../user/user.service';
-import * as bcrypt from 'bcrypt';
 import { User } from '../generated/prisma';
 import { AuthTokenDTO } from './dto/auth-token.dto';
 
@@ -10,7 +8,6 @@ import { AuthTokenDTO } from './dto/auth-token.dto';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService,
     private readonly userService: UserService,
   ) {}
 
@@ -19,6 +16,7 @@ export class AuthService {
       accessToken: this.jwtService.sign({
         sub: user.REC,
         name: user.NOME,
+        cgc: user.CGC,
       }),
     };
   }
@@ -46,18 +44,10 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        EMAIL: email,
-      },
-    });
+  async login(id: string) {
+    const user = await this.userService.findByCgc(id);
 
     if (!user) throw new UnauthorizedException('Usuario não encontrado');
-
-    const check = await bcrypt.compare(password, user.CGC);
-
-    if (!check) throw new UnauthorizedException('Email e/ou senha incorretos');
 
     return this.createToken(user);
   }
