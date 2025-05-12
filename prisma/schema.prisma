@@ -1,15 +1,39 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider        = "prisma-client-js"
+ output           = "../src/generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
+}
+
+view User {
+  REC         Int       @unique
+  CODIGO      String   @db.VarChar(6)
+  CGC         String   @db.VarChar(14)
+  NOME        String   @db.VarChar(50)
+  EMAIL       String   @db.VarChar(60)
+  NASCIMENTO  DateTime @db.Date
+
+  @@map("USUARIOS_MEU_PORTAL_ROMMANEL")
+}
+
+view Payment {
+  RECE1       Int      @unique
+  RECA1       Int      @db.Int
+  NUMERO      String   @db.VarChar(9)
+  TIPO        String   @db.VarChar(3)
+  SERIE       String   @db.VarChar(3)
+  LINDIG      String   @db.VarChar(48)
+  CODBARRAS   String   @db.VarChar(44)
+  NUMBCO      String   @db.VarChar(17)
+  BORDERO     String   @db.VarChar(6)
+  EMISSAO     DateTime @db.Date
+  PAGAMENTO   DateTime @db.Date
+  VALOR       Float
+  SALDO       Float
+
+  @@map("BOLETOS_MEU_PORTAL_ROMMANEL")
 }

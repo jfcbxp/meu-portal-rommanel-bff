@@ -1,0 +1,8 @@
+node_modules
+dist
+generated
+test/coverage
+.env
+.env.*
+.eslintrc.js
+.prettierrc
