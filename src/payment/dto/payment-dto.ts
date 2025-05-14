@@ -30,6 +30,9 @@ export class PaymentDTO {
   @Expose({ name: 'VALOR' })
   amount: number;
 
+  @Expose({ name: 'PRODUTO' })
+  product: string;
+
   @Expose({ name: 'SALDO' })
   balance: number;
 }
