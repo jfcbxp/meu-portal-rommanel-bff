@@ -36,8 +36,9 @@ view Payment {
   PAGAMENTO   DateTime @db.Date
   VALOR       Float
   SALDO       Float
+  QUANTIDADE  Float
 
-  @@map("BOLETOS_MEU_PORTAL_ROMMANEL")
+  @@map("RECEBER_MEU_PORTAL_ROMMANEL")
 }
 
 view Order {
