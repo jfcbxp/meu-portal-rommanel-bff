@@ -1,11 +1,11 @@
 import { Expose } from 'class-transformer';
 
 export class OrderDTO {
-  @Expose({ name: 'REC' })
+  @Expose({ name: 'RECD2' })
   id: number;
 
   @Expose({ name: 'EMPRESA' })
-  company: string;
+  branch: string;
 
   @Expose({ name: 'DOCUMENTO' })
   document: string;
@@ -30,4 +30,7 @@ export class OrderDTO {
 
   @Expose({ name: 'TOTAL' })
   total: number;
+
+  @Expose()
+  image: string;
 }

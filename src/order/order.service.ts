@@ -13,27 +13,23 @@ export class OrderService {
     });
   }
 
-  async findByDocument(userId: number, branch: string, document: string, version: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
-    const [content, total] = await Promise.all([
-      this.prisma.order.findMany({
-        where: { RECA1: userId, DOCUMENTO: document, SERIE: version, EMPRESA: branch },
-        skip,
-        take: limit,
-        orderBy: { ITEM: 'asc' },
-      }),
-      this.prisma.order.count({
-        where: { RECA1: userId, DOCUMENTO: document, SERIE: version, EMPRESA: branch },
-      }),
-    ]);
+  async findByDocument(userId: number, branch: string, document: string, version: string) {
+    const content = await this.prisma.order.findMany({
+      where: { RECA1: userId, DOCUMENTO: document, SERIE: version, EMPRESA: branch },
+      orderBy: { ITEM: 'asc' },
+    });
 
     const orders = plainToInstance(OrderDTO, content, { excludeExtraneousValues: true });
 
     return {
-      content: orders,
+      content: orders.map((order) => this.optimizeOrderResponse(order)),
       totalElements: orders.length,
-      page,
-      totalPages: Math.ceil(total / limit),
     };
+  }
+
+  private optimizeOrderResponse(order: OrderDTO) {
+    order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
+
+    return order;
   }
 }

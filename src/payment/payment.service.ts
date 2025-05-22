@@ -37,11 +37,17 @@ export class PaymentService {
     return {
       days: this.getDays(),
       types: this.getTypes(),
-      content: payments,
+      content: payments.map((payment) => this.optimizePaymentResponse(payment)),
       totalElements: payments.length,
       page,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  private optimizePaymentResponse(payment: PaymentDTO) {
+    payment.status = payment.balance > 0 ? 'Pendente' : 'Pago';
+
+    return payment;
   }
 
   private getDays(): PaymentFilterResponseDTO[] {

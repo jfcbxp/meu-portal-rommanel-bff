@@ -24,6 +24,7 @@ view Payment {
   RECE1       Int      @unique
   RECA1       Int      @db.Int
   EMPRESA     String   @db.VarChar(4)
+  NOMEEMP     String   @db.VarChar(40)
   NUMERO      String   @db.VarChar(9)
   TIPO        String   @db.VarChar(3)
   SERIE       String   @db.VarChar(3)
