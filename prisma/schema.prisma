@@ -23,6 +23,8 @@ view User {
 view Payment {
   RECE1       Int      @unique
   RECA1       Int      @db.Int
+  EMPRESA     String   @db.VarChar(4)
+  NOMEEMP     String   @db.VarChar(40)
   NUMERO      String   @db.VarChar(9)
   TIPO        String   @db.VarChar(3)
   SERIE       String   @db.VarChar(3)
@@ -30,10 +32,27 @@ view Payment {
   CODBARRAS   String   @db.VarChar(44)
   NUMBCO      String   @db.VarChar(17)
   BORDERO     String   @db.VarChar(6)
+  PRODUTO     String   @db.VarChar(15)
   EMISSAO     DateTime @db.Date
   PAGAMENTO   DateTime @db.Date
   VALOR       Float
   SALDO       Float
+  QUANTIDADE  Float
 
-  @@map("BOLETOS_MEU_PORTAL_ROMMANEL")
+  @@map("RECEBER_MEU_PORTAL_ROMMANEL")
+}
+
+view Order {
+  RECD2       Int      @unique
+  RECA1       Int      @db.Int
+  EMPRESA     String   @db.VarChar(4)
+  DOCUMENTO   String   @db.VarChar(9)
+  SERIE       String   @db.VarChar(3)
+  PRODUTO     String   @db.VarChar(15)
+  DESCRICAO   String   @db.VarChar(50)
+  ITEM        String   @db.VarChar(2)
+  QUANTIDADE  Float
+  PRECO       Float
+  TOTAL       Float
+  @@map("VENDAS_MEU_PORTAL_ROMMANEL")
 }

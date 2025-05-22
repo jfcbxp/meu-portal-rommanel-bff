@@ -4,6 +4,12 @@ export class PaymentDTO {
   @Expose({ name: 'RECE1' })
   id: number;
 
+  @Expose({ name: 'EMPRESA' })
+  branch: string;
+
+  @Expose({ name: 'NOMEEMP' })
+  branchDescription: string;
+
   @Expose({ name: 'NUMERO' })
   document: string;
 
@@ -30,6 +36,15 @@ export class PaymentDTO {
   @Expose({ name: 'VALOR' })
   amount: number;
 
+  @Expose({ name: 'PRODUTO' })
+  product: string;
+
+  @Expose({ name: 'QUANTIDADE' })
+  quantity: number;
+
   @Expose({ name: 'SALDO' })
   balance: number;
+
+  @Expose()
+  status: string;
 }
