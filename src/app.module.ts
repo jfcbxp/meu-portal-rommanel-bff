@@ -8,9 +8,11 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { OrderModule } from './order/order.module';
 import HealthController from '@health/health.controller';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
   imports: [
+    TerminusModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60,

@@ -5,6 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import PaymentFilterResponseDTO from './dto/payment-filter.response.dto';
 import { FilterDaysEnum } from 'src/enums/filter-days.enum';
 import { FilterTypesEnum } from 'src/enums/filter-types.enum';
+import { PaymentListParamsDto } from './dto/payment-list-params.dto';
 
 @Injectable()
 export class PaymentService {
@@ -18,17 +19,34 @@ export class PaymentService {
     });
   }
 
-  async findAll(id: number, page: number, limit: number) {
+  async findAll(id: number, page: number, limit: number, params: PaymentListParamsDto) {
     const skip = (page - 1) * limit;
+
+    // Use tipagem leve para views
+    const where: { [key: string]: unknown } = { RECA1: id };
+
+    if (params.startDate) {
+      where.EMISSAO = { ...(where.EMISSAO ?? {}), gte: new Date(params.startDate) };
+    }
+    if (params.endDate) {
+      where.EMISSAO = { ...(where.EMISSAO ?? {}), lte: new Date(params.endDate) };
+    }
+    if (params.type) {
+      where.TIPO = params.type;
+    }
+    if (params.status) {
+      where.STATUS = params.status;
+    }
+
     const [content, total] = await Promise.all([
       this.prisma.payment.findMany({
-        where: { RECA1: id },
+        where,
         skip,
         take: limit,
         orderBy: { EMISSAO: 'desc' },
       }),
       this.prisma.payment.count({
-        where: { RECA1: id },
+        where,
       }),
     ]);
 
@@ -37,17 +55,11 @@ export class PaymentService {
     return {
       days: this.getDays(),
       types: this.getTypes(),
-      content: payments.map((payment) => this.optimizePaymentResponse(payment)),
+      content: payments,
       totalElements: payments.length,
-      page,
+      page: page,
       totalPages: Math.ceil(total / limit),
     };
-  }
-
-  private optimizePaymentResponse(payment: PaymentDTO) {
-    payment.status = payment.balance > 0 ? 'Pendente' : 'Pago';
-
-    return payment;
   }
 
   private getDays(): PaymentFilterResponseDTO[] {

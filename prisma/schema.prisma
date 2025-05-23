@@ -34,11 +34,13 @@ view Payment {
   BORDERO     String   @db.VarChar(6)
   PRODUTO     String   @db.VarChar(15)
   EMISSAO     DateTime @db.Date
+  VENCREA     DateTime @db.Date
+  VENCTO      DateTime @db.Date
   PAGAMENTO   DateTime @db.Date
   VALOR       Float
   SALDO       Float
   QUANTIDADE  Float
-
+  SITUACAO    String   @db.VarChar(8)
   @@map("RECEBER_MEU_PORTAL_ROMMANEL")
 }
 
