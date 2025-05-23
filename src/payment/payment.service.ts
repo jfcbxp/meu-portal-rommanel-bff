@@ -29,7 +29,8 @@ export class PaymentService {
       where.EMISSAO = { ...(where.EMISSAO ?? {}), gte: new Date(params.startDate) };
     }
     if (params.endDate) {
-      where.EMISSAO = { ...(where.EMISSAO ?? {}), lte: new Date(params.endDate) };
+      const end = new Date(params.endDate + 'T23:59:59.999');
+      where.EMISSAO = { ...(where.EMISSAO ?? {}), lte: end };
     }
     if (params.type) {
       where.TIPO = params.type;
