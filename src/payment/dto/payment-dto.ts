@@ -55,4 +55,7 @@ export class PaymentDTO {
 
   @Expose({ name: 'SITUACAO' })
   status: string;
+
+  @Expose()
+  image: string;
 }

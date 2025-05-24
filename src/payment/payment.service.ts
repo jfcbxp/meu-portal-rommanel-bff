@@ -58,7 +58,7 @@ export class PaymentService {
       days: this.getDays(),
       types: this.getTypes(),
       status: this.getStatus(),
-      content: payments,
+      content: payments.map((payment) => this.optimizePaymentResponse(payment)),
       totalElements: payments.length,
       page: page,
       totalPages: Math.ceil(total / limit),
@@ -93,5 +93,11 @@ export class PaymentService {
   private getEnumKeyByEnumValue(myEnum: Record<string, string | number>, enumValue: number | string): string {
     const keys = Object.keys(myEnum).filter((x) => myEnum[x] == enumValue);
     return keys.length > 0 ? keys[0] : '';
+  }
+
+  private optimizePaymentResponse(order: PaymentDTO) {
+    order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
+
+    return order;
   }
 }
