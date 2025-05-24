@@ -7,9 +7,12 @@ import { PaymentModule } from './payment/payment.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { OrderModule } from './order/order.module';
+import HealthController from '@health/health.controller';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
   imports: [
+    TerminusModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60,
@@ -21,7 +24,7 @@ import { OrderModule } from './order/order.module';
     forwardRef(() => PaymentModule),
     forwardRef(() => OrderModule),
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
