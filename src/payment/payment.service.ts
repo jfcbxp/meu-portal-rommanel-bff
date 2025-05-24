@@ -6,6 +6,7 @@ import PaymentFilterResponseDTO from './dto/payment-filter.response.dto';
 import { FilterDaysEnum } from 'src/enums/filter-days.enum';
 import { FilterTypesEnum } from 'src/enums/filter-types.enum';
 import { PaymentListParamsDto } from './dto/payment-list-params.dto';
+import { FilterStatusEnum } from 'src/enums/filter-status.enum';
 
 @Injectable()
 export class PaymentService {
@@ -22,7 +23,6 @@ export class PaymentService {
   async findAll(id: number, page: number, limit: number, params: PaymentListParamsDto) {
     const skip = (page - 1) * limit;
 
-    // Use tipagem leve para views
     const where: { [key: string]: unknown } = { RECA1: id };
 
     if (params.startDate) {
@@ -36,7 +36,8 @@ export class PaymentService {
       where.TIPO = params.type;
     }
     if (params.status) {
-      where.STATUS = params.status;
+      const status = FilterStatusEnum[params.status] as string;
+      where.SITUACAO = status;
     }
 
     const [content, total] = await Promise.all([
@@ -56,6 +57,7 @@ export class PaymentService {
     return {
       days: this.getDays(),
       types: this.getTypes(),
+      status: this.getStatus(),
       content: payments,
       totalElements: payments.length,
       page: page,
@@ -73,6 +75,13 @@ export class PaymentService {
   private getTypes(): PaymentFilterResponseDTO[] {
     return Object.values(FilterTypesEnum).map((value) => ({
       code: this.getEnumKeyByEnumValue(FilterTypesEnum, value),
+      description: value,
+    }));
+  }
+
+  private getStatus(): PaymentFilterResponseDTO[] {
+    return Object.values(FilterStatusEnum).map((value) => ({
+      code: this.getEnumKeyByEnumValue(FilterStatusEnum, value),
       description: value,
     }));
   }
