@@ -59,7 +59,8 @@ export class PaymentService {
       types: this.getTypes(),
       status: this.getStatus(),
       content: payments.map((payment) => this.optimizePaymentResponse(payment)),
-      totalElements: payments.length,
+      elements: payments.length,
+      totalElements: total,
       page: page,
       totalPages: Math.ceil(total / limit),
     };
