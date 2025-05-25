@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentDTO } from './dto/payment-dto';
 import { plainToInstance } from 'class-transformer';
+import PaymentFilterResponseDTO from './dto/payment-filter.response.dto';
+import { FilterDaysEnum } from 'src/enums/filter-days.enum';
+import { FilterTypesEnum } from 'src/enums/filter-types.enum';
+import { PaymentListParamsDto } from './dto/payment-list-params.dto';
+import { FilterStatusEnum } from 'src/enums/filter-status.enum';
 
 @Injectable()
 export class PaymentService {
@@ -15,27 +20,85 @@ export class PaymentService {
     });
   }
 
-  async findAll(id: number, page: number, limit: number) {
+  async findAll(id: number, page: number, limit: number, params: PaymentListParamsDto) {
     const skip = (page - 1) * limit;
+
+    const where: { [key: string]: unknown } = { RECA1: id };
+
+    if (params.startDate) {
+      where.EMISSAO = { ...(where.EMISSAO ?? {}), gte: new Date(params.startDate) };
+    }
+    if (params.endDate) {
+      const end = new Date(params.endDate + 'T23:59:59.999');
+      where.EMISSAO = { ...(where.EMISSAO ?? {}), lte: end };
+    }
+    if (params.type) {
+      where.TIPO = params.type;
+    }
+    if (params.status) {
+      const status = FilterStatusEnum[params.status] as string;
+      where.SITUACAO = status;
+    }
+
     const [content, total] = await Promise.all([
       this.prisma.payment.findMany({
-        where: { RECA1: id },
+        where,
         skip,
         take: limit,
         orderBy: { EMISSAO: 'desc' },
       }),
       this.prisma.payment.count({
-        where: { RECA1: id },
+        where,
       }),
     ]);
 
     const payments = plainToInstance(PaymentDTO, content, { excludeExtraneousValues: true });
 
     return {
-      content: payments,
-      totalElements: payments.length,
-      page,
+      days: this.getDays(),
+      types: this.getTypes(),
+      status: this.getStatus(),
+      content: payments.map((payment) => this.optimizePaymentResponse(payment)),
+      elements: payments.length,
+      totalElements: total,
+      page: page,
       totalPages: Math.ceil(total / limit),
     };
+  }
+
+  private getDays(): PaymentFilterResponseDTO[] {
+    return Object.values(FilterDaysEnum).map((value) => ({
+      code: value,
+      description: this.getDayDescription(value),
+    }));
+  }
+
+  private getTypes(): PaymentFilterResponseDTO[] {
+    return Object.values(FilterTypesEnum).map((value) => ({
+      code: this.getEnumKeyByEnumValue(FilterTypesEnum, value),
+      description: value,
+    }));
+  }
+
+  private getStatus(): PaymentFilterResponseDTO[] {
+    return Object.values(FilterStatusEnum).map((value) => ({
+      code: this.getEnumKeyByEnumValue(FilterStatusEnum, value),
+      description: value,
+    }));
+  }
+
+  private getDayDescription(day: FilterDaysEnum): string {
+    return day === FilterDaysEnum.YEAR ? `1 Ano` : `${day} Dias`;
+  }
+
+  private getEnumKeyByEnumValue(myEnum: Record<string, string | number>, enumValue: number | string): string {
+    const keys = Object.keys(myEnum).filter((x) => myEnum[x] == enumValue);
+    return keys.length > 0 ? keys[0] : '';
+  }
+
+  private optimizePaymentResponse(order: PaymentDTO) {
+    order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
+
+    return order;
   }
 }

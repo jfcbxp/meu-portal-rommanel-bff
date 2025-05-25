@@ -4,6 +4,12 @@ export class PaymentDTO {
   @Expose({ name: 'RECE1' })
   id: number;
 
+  @Expose({ name: 'EMPRESA' })
+  branch: string;
+
+  @Expose({ name: 'NOMEEMP' })
+  branchDescription: string;
+
   @Expose({ name: 'NUMERO' })
   document: string;
 
@@ -23,6 +29,14 @@ export class PaymentDTO {
   @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
   date: string;
 
+  @Expose({ name: 'VENCTO' })
+  @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
+  invoiceDate: string;
+
+  @Expose({ name: 'VENCREA' })
+  @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
+  invoiceWorkingDate: string;
+
   @Expose({ name: 'PAGAMENTO' })
   @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
   paymentDate: string;
@@ -30,6 +44,18 @@ export class PaymentDTO {
   @Expose({ name: 'VALOR' })
   amount: number;
 
+  @Expose({ name: 'PRODUTO' })
+  product: string;
+
+  @Expose({ name: 'QUANTIDADE' })
+  quantity: number;
+
   @Expose({ name: 'SALDO' })
   balance: number;
+
+  @Expose({ name: 'SITUACAO' })
+  status: string;
+
+  @Expose()
+  image: string;
 }
