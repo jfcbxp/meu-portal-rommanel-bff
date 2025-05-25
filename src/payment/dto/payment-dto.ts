@@ -29,6 +29,14 @@ export class PaymentDTO {
   @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
   date: string;
 
+  @Expose({ name: 'VENCTO' })
+  @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
+  invoiceDate: string;
+
+  @Expose({ name: 'VENCREA' })
+  @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
+  invoiceWorkingDate: string;
+
   @Expose({ name: 'PAGAMENTO' })
   @Transform(({ value }) => (value ? new Date(value as Date).toLocaleDateString('pt-BR') : ''))
   paymentDate: string;
@@ -45,6 +53,9 @@ export class PaymentDTO {
   @Expose({ name: 'SALDO' })
   balance: number;
 
-  @Expose()
+  @Expose({ name: 'SITUACAO' })
   status: string;
+
+  @Expose()
+  image: string;
 }
