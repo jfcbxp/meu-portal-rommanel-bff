@@ -7,6 +7,8 @@ import { FilterDaysEnum } from 'src/enums/filter-days.enum';
 import { FilterTypesEnum } from 'src/enums/filter-types.enum';
 import { PaymentListParamsDto } from './dto/payment-list-params.dto';
 import { FilterStatusEnum } from 'src/enums/filter-status.enum';
+import PaymentGroupResponseDTO from './dto/payment-group-response.dto';
+import { AppConstants } from '@constants/app.constants';
 
 @Injectable()
 export class PaymentService {
@@ -58,7 +60,7 @@ export class PaymentService {
       days: this.getDays(),
       types: this.getTypes(),
       status: this.getStatus(),
-      content: payments.map((payment) => this.optimizePaymentResponse(payment)),
+      content: this.getGroupedPayments(payments),
       elements: payments.length,
       totalElements: total,
       page: page,
@@ -96,9 +98,46 @@ export class PaymentService {
     return keys.length > 0 ? keys[0] : '';
   }
 
+  private getGroupedPayments(payments: PaymentDTO[]): PaymentGroupResponseDTO[] {
+    const days = payments.map((payment) => ({
+      code: payment.invoiceWorkingDate.split('T')[0],
+      order: this.optimizePaymentResponse(payment),
+    }));
+
+    const result = days.reduce(
+      (accumulator, current) =>
+        accumulator.set(current.code, [...new Set([...(accumulator.get(current.code) || []), current.order])]),
+      new Map<string, PaymentDTO[]>(),
+    );
+
+    const response: PaymentGroupResponseDTO[] = [...result].map((item) => {
+      return {
+        groupId: item[0],
+        description: this.getGroupDescription(item[0]),
+        orders: item[1],
+      };
+    });
+
+    return response;
+  }
+
   private optimizePaymentResponse(order: PaymentDTO) {
     order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
 
     return order;
+  }
+
+  private getGroupDescription(groupId: string) {
+    // Espera groupId no formato "dd/MM/yyyy"
+    const [day, month, year] = groupId.split('/').map(Number);
+    const baseDate = new Date(year, month - 1, day); // mês começa em 0
+
+    const dayStr = baseDate.getDate().toString().padStart(2, '0');
+    const monthStr = baseDate
+      .toLocaleString(AppConstants.LOCALE_STRING_BR, { month: 'long' })
+      .replace(/^./, (str) => str.toUpperCase());
+    const yearStr = baseDate.getFullYear();
+
+    return `${dayStr} ${monthStr} ${yearStr}`;
   }
 }
