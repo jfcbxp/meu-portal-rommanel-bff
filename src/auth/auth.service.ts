@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { User } from '../generated/prisma';
@@ -7,6 +7,8 @@ import { Role } from 'src/enums/role.enum';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
@@ -32,7 +34,7 @@ export class AuthService {
 
       return response;
     } catch (e) {
-      throw new BadRequestException(e);
+      throw new UnauthorizedException(e);
     }
   }
 
@@ -48,6 +50,8 @@ export class AuthService {
 
   async login(id: string) {
     const user = await this.userService.findByCgc(id);
+
+    this.logger.log(`AuthService.login - Start: ${id}`);
 
     if (!user) throw new UnauthorizedException('Usuario não encontrado');
 

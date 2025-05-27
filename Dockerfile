@@ -3,14 +3,12 @@ FROM node:20
 WORKDIR /app
 
 COPY ["package.json", "yarn.lock", "./"]
+RUN yarn install --production --frozen-lockfile
 
-RUN npm install --production
-
+COPY .env.* ./
 COPY ./dist ./dist
 
 COPY dist/main.js dist/server.js
-
-COPY .env.* ./
 
 EXPOSE 8080
 

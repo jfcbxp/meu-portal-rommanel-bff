@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentDTO } from './dto/payment-dto';
 import { plainToInstance } from 'class-transformer';
@@ -7,12 +7,18 @@ import { FilterDaysEnum } from 'src/enums/filter-days.enum';
 import { FilterTypesEnum } from 'src/enums/filter-types.enum';
 import { PaymentListParamsDto } from './dto/payment-list-params.dto';
 import { FilterStatusEnum } from 'src/enums/filter-status.enum';
+import PaymentGroupResponseDTO from './dto/payment-group-response.dto';
+import { AppConstants } from '@constants/app.constants';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async find(id: number) {
+    this.logger.log(`PaymentService.find - Start: ${id}`);
+
     return await this.prisma.payment.findUnique({
       where: {
         RECE1: id,
@@ -21,6 +27,8 @@ export class PaymentService {
   }
 
   async findAll(id: number, page: number, limit: number, params: PaymentListParamsDto) {
+    this.logger.log(`PaymentService.findAll - Start: ${id}`);
+
     const skip = (page - 1) * limit;
 
     const where: { [key: string]: unknown } = { RECA1: id };
@@ -54,11 +62,13 @@ export class PaymentService {
 
     const payments = plainToInstance(PaymentDTO, content, { excludeExtraneousValues: true });
 
+    this.logger.log(`PaymentService.findAll - End: ${id}`);
+
     return {
       days: this.getDays(),
       types: this.getTypes(),
       status: this.getStatus(),
-      content: payments.map((payment) => this.optimizePaymentResponse(payment)),
+      content: this.getGroupedPayments(payments),
       elements: payments.length,
       totalElements: total,
       page: page,
@@ -96,9 +106,46 @@ export class PaymentService {
     return keys.length > 0 ? keys[0] : '';
   }
 
+  private getGroupedPayments(payments: PaymentDTO[]): PaymentGroupResponseDTO[] {
+    const days = payments.map((payment) => ({
+      code: payment.invoiceWorkingDate.split('T')[0],
+      order: this.optimizePaymentResponse(payment),
+    }));
+
+    const result = days.reduce(
+      (accumulator, current) =>
+        accumulator.set(current.code, [...new Set([...(accumulator.get(current.code) || []), current.order])]),
+      new Map<string, PaymentDTO[]>(),
+    );
+
+    const response: PaymentGroupResponseDTO[] = [...result].map((item) => {
+      return {
+        groupId: item[0],
+        description: this.getGroupDescription(item[0]),
+        orders: item[1],
+      };
+    });
+
+    return response;
+  }
+
   private optimizePaymentResponse(order: PaymentDTO) {
     order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
 
     return order;
+  }
+
+  private getGroupDescription(groupId: string) {
+    // Espera groupId no formato "dd/MM/yyyy"
+    const [day, month, year] = groupId.split('/').map(Number);
+    const baseDate = new Date(year, month - 1, day); // mês começa em 0
+
+    const dayStr = baseDate.getDate().toString().padStart(2, '0');
+    const monthStr = baseDate
+      .toLocaleString(AppConstants.LOCALE_STRING_BR, { month: 'long' })
+      .replace(/^./, (str) => str.toUpperCase());
+    const yearStr = baseDate.getFullYear();
+
+    return `${dayStr} ${monthStr} ${yearStr}`;
   }
 }

@@ -16,6 +16,9 @@ export class PaymentDTO {
   @Expose({ name: 'SERIE' })
   version: string;
 
+  @Expose({ name: 'PARCELA' })
+  installment: string;
+
   @Expose({ name: 'TIPO' })
   type: string;
 
