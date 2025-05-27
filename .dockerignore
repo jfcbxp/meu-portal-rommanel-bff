@@ -1,0 +1,10 @@
+# .dockerignore
+node_modules
+dist
+test
+coverage
+.git
+Dockerfile
+docker-compose.yml
+*.md
+prisma/dev.db
