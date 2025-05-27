@@ -5,8 +5,9 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
-COPY . .
-
+COPY prisma ./prisma
+COPY src ./src
+COPY .env.* ./
 RUN yarn prisma generate
 RUN yarn build
 
@@ -21,11 +22,9 @@ COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 COPY --from=builder /app/dist ./dist
-
 COPY --from=builder /app/src/generated ./dist/generated
-
+COPY --from=builder /app/prisma ./prisma
 COPY .env.* ./
-
 COPY --from=builder /app/dist/main.js ./dist/server.js
 
 EXPOSE 8080
