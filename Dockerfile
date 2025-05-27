@@ -8,6 +8,9 @@ RUN yarn install --frozen-lockfile
 COPY prisma ./prisma
 COPY src ./src
 COPY .env.* ./
+COPY tsconfig.json ./
+COPY tsconfig.build.json ./
+COPY nest-cli.json ./
 RUN yarn prisma generate
 RUN yarn build
 
