@@ -34,11 +34,11 @@ export class PaymentService {
     const where: { [key: string]: unknown } = { RECA1: id };
 
     if (params.startDate) {
-      where.EMISSAO = { ...(where.EMISSAO ?? {}), gte: new Date(params.startDate) };
+      where.VENCREA = { ...(where.VENCREA ?? {}), gte: new Date(params.startDate) };
     }
     if (params.endDate) {
       const end = new Date(params.endDate + 'T23:59:59.999');
-      where.EMISSAO = { ...(where.EMISSAO ?? {}), lte: end };
+      where.VENCREA = { ...(where.VENCREA ?? {}), lte: end };
     }
     if (params.type) {
       where.TIPO = params.type;
@@ -53,7 +53,7 @@ export class PaymentService {
         where,
         skip,
         take: limit,
-        orderBy: { EMISSAO: 'desc' },
+        orderBy: { VENCREA: 'desc' },
       }),
       this.prisma.payment.count({
         where,
