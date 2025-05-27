@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentDTO } from './dto/payment-dto';
 import { plainToInstance } from 'class-transformer';
@@ -12,9 +12,13 @@ import { AppConstants } from '@constants/app.constants';
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async find(id: number) {
+    this.logger.log(`PaymentService.find - Start: ${id}`);
+
     return await this.prisma.payment.findUnique({
       where: {
         RECE1: id,
@@ -23,6 +27,8 @@ export class PaymentService {
   }
 
   async findAll(id: number, page: number, limit: number, params: PaymentListParamsDto) {
+    this.logger.log(`PaymentService.findAll - Start: ${id}`);
+
     const skip = (page - 1) * limit;
 
     const where: { [key: string]: unknown } = { RECA1: id };
@@ -55,6 +61,8 @@ export class PaymentService {
     ]);
 
     const payments = plainToInstance(PaymentDTO, content, { excludeExtraneousValues: true });
+
+    this.logger.log(`PaymentService.findAll - End: ${id}`);
 
     return {
       days: this.getDays(),
