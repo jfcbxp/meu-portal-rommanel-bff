@@ -130,7 +130,7 @@ export class PaymentService {
   }
 
   private optimizePaymentResponse(order: PaymentDTO) {
-    order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
+    if (order.product) order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
 
     return order;
   }
