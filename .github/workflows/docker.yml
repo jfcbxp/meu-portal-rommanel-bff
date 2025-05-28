@@ -1,58 +1,42 @@
-name: Node Docker Image
+name: NestJS Docker Image
 
 on:
   push:
     branches: ['develop']
+
 jobs:
   buildservice:
-    name: build
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
+
     steps:
-      - name: generate buildnumber
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Generate build number
         id: buildnumber
         uses: einaregilsson/build-number@v3
         with:
-          token: ${{secrets.github_token}}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: checkout service
-        uses: actions/checkout@v2
-        with:
-          path: service
-
-      - name: read docker properties
+      - name: Read docker properties
         uses: madhead/read-java-properties@latest
         id: docker
         with:
-          file: service/docker.properties
+          file: docker.properties
           all: true
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-        working-directory: ./service
-
-      - name: Build app
-        run: yarn build
-        working-directory: ./service
-
-      - name: dockerhub login
+      - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: push docker image
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: ./service
+          context: .
           push: true
           tags: |
             jfcbxp/${{ steps.docker.outputs.IMAGE_NAME }}:${{ steps.docker.outputs.MAJOR_VERSION }}.${{ steps.docker.outputs.MINOR_VERSION }}.${{ steps.buildnumber.outputs.build_number }}
             jfcbxp/${{ steps.docker.outputs.IMAGE_NAME }}:latest
-          build-args: |
-            ARTIFACT_NAME=${{ steps.docker.outputs.ARTIFACT_NAME }}
-            IMAGE_VERSION=${{ steps.docker.outputs.IMAGE_NAME }}:${{ steps.docker.outputs.MAJOR_VERSION }}.${{ steps.docker.outputs.MINOR_VERSION }}.${{ steps.buildnumber.outputs.build_number }}

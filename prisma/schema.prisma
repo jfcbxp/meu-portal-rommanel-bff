@@ -28,6 +28,7 @@ view Payment {
   NUMERO      String   @db.VarChar(9)
   TIPO        String   @db.VarChar(3)
   SERIE       String   @db.VarChar(3)
+  PARCELA     String   @db.VarChar(3)
   LINDIG      String   @db.VarChar(48)
   CODBARRAS   String   @db.VarChar(44)
   NUMBCO      String   @db.VarChar(17)
@@ -41,6 +42,7 @@ view Payment {
   SALDO       Float
   QUANTIDADE  Float
   SITUACAO    String   @db.VarChar(8)
+  TIPODESC    String   @db.VarChar(8)
   @@map("RECEBER_MEU_PORTAL_ROMMANEL")
 }
 
