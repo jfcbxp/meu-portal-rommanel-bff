@@ -34,7 +34,7 @@ export class OrderService {
   }
 
   private optimizeOrderResponse(order: OrderDTO) {
-    order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product}`;
+    if (order.product) order.image = `${process.env.PRODUCT_IMAGE_BASE_URL}/${order.product.substring(0, 6)}.jpg`;
 
     return order;
   }
