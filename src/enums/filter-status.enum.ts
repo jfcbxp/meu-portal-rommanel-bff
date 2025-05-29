@@ -1,4 +1,5 @@
 export enum FilterStatusEnum {
   PAID = 'Pago',
-  PENDING = 'Pendente ',
+  PARTIALLY_PAID = 'Pago Parcialmente',
+  PENDING = 'Pendente',
 }
