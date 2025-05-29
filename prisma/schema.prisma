@@ -24,7 +24,7 @@ view Payment {
   RECE1       Int      @unique
   RECA1       Int      @db.Int
   EMPRESA     String   @db.VarChar(4)
-  NOMEEMP     String   @db.VarChar(40)
+  NOMEEMP     String   @db.VarChar(41)
   NUMERO      String   @db.VarChar(9)
   TIPO        String   @db.VarChar(3)
   SERIE       String   @db.VarChar(3)
@@ -41,8 +41,8 @@ view Payment {
   VALOR       Float
   SALDO       Float
   QUANTIDADE  Float
-  SITUACAO    String   @db.VarChar(8)
-  TIPODESC    String   @db.VarChar(8)
+  SITUACAO    String   @db.VarChar(17)
+  TIPODESC    String   @db.VarChar(16)
   @@map("RECEBER_MEU_PORTAL_ROMMANEL")
 }
 
