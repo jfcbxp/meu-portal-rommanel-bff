@@ -11,7 +11,7 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: AuthLoginDTO) {
-    return this.authService.login(body.id);
+    return this.authService.login(body.id, body.password);
   }
 
   @UseGuards(AuthGuard)
