@@ -48,8 +48,8 @@ export class AuthService {
     }
   }
 
-  async login(id: string) {
-    const user = await this.userService.findByCgc(id);
+  async login(id: string, password: string) {
+    const user = await this.userService.findByCgcAndPassword(id, password);
 
     this.logger.log(`AuthService.login - Start: ${id}`);
 

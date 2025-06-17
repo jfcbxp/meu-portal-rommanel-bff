@@ -16,6 +16,7 @@ view User {
   NOME        String   @db.VarChar(50)
   EMAIL       String   @db.VarChar(60)
   NASCIMENTO  DateTime @db.Date
+  SENHA       String   @db.VarChar(30)
 
   @@map("USUARIOS_MEU_PORTAL_ROMMANEL")
 }
