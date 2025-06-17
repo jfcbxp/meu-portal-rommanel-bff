@@ -13,10 +13,11 @@ export class UserService {
     });
   }
 
-  async findByCgc(id: string) {
+  async findByCgcAndPassword(id: string, password: string) {
     return await this.prisma.user.findFirst({
       where: {
         CGC: id,
+        SENHA: password,
       },
     });
   }
