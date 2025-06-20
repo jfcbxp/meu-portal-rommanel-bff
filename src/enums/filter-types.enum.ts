@@ -7,4 +7,5 @@ export enum FilterTypesEnum {
   CD = 'Cartão de Débito',
   PX = 'Pix',
   CH = 'Cheque',
+  R$ = 'Dinheiro',
 }
