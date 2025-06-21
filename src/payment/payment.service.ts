@@ -33,6 +33,8 @@ export class PaymentService {
 
     const where: { [key: string]: unknown } = { RECA1: id };
 
+    let orderBy: 'asc' | 'desc' = 'desc';
+
     if (params.startDate) {
       where.VENCREA = { ...(where.VENCREA ?? {}), gte: new Date(params.startDate) };
     }
@@ -46,6 +48,7 @@ export class PaymentService {
     if (params.status) {
       const status = FilterStatusEnum[params.status] as string;
       where.SITUACAO = status;
+      if (FilterStatusEnum[params.status] === FilterStatusEnum.PENDING) orderBy = 'asc';
     }
 
     const [content, total] = await Promise.all([
@@ -53,7 +56,7 @@ export class PaymentService {
         where,
         skip,
         take: limit,
-        orderBy: { VENCREA: 'desc' },
+        orderBy: { VENCREA: orderBy },
       }),
       this.prisma.payment.count({
         where,

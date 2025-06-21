@@ -3,5 +3,6 @@ export enum FilterDaysEnum {
   FIFTEEN = '15',
   THIRTY = '30',
   SIXTY = '60',
+  NINETY = '90',
   YEAR = '365',
 }
