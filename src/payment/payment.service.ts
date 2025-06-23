@@ -10,6 +10,9 @@ import { FilterStatusEnum } from 'src/enums/filter-status.enum';
 import PaymentGroupResponseDTO from './dto/payment-group-response.dto';
 import { AppConstants } from '@constants/app.constants';
 import { PaymentClient } from './payment.client';
+import PaymentCheckoutRequestDTO from './dto/payment-checkout.request.dto';
+import ProtheusCheckoutRequestDTO from './dto/protheus-checkout.request.dto';
+import PaymentCheckoutResponseDTO from './dto/payment-checkout.response.dto';
 
 @Injectable()
 export class PaymentService {
@@ -83,14 +86,31 @@ export class PaymentService {
     };
   }
 
-  async createCheckout(userId: number, request: any) {
-    this.logger.log(`PaymentService.checkout - Start: ${userId}`);
+  async createCheckout(userId: number, request: PaymentCheckoutRequestDTO) {
+    this.logger.log(`PaymentService.createCheckout - Start: ${userId}`);
 
-    const response = await this.paymentClient.getCheckout(request);
+    const { branch, installment, version, type, document } = request;
 
-    this.logger.log(`PaymentService.checkout - End: ${userId}`);
+    const protheusRequest: ProtheusCheckoutRequestDTO = {
+      filial: branch,
+      parcela: installment,
+      prefixo: version,
+      tipo: type,
+      titulo: document,
+    };
 
-    return response;
+    const result = await this.paymentClient.createCheckout(protheusRequest);
+
+    this.logger.log(`PaymentService.createCheckout - End: ${userId}`);
+
+    return {
+      balance: result.saldo,
+      discount: result.abatimento,
+      fee: result.multa,
+      tax: result.juros,
+      amount: result.valor,
+      total: result.pagar,
+    } as PaymentCheckoutResponseDTO;
   }
 
   private getDays(): PaymentFilterResponseDTO[] {

@@ -18,7 +18,7 @@ WSMETHOD POST CHECKOUT DESCRIPTION "Cria um checkout" PATH "/v1/checkout" TTALK 
 
 END WSRESTFUL
 
-WSMETHOD POST GETCHECKOUT WSSERVICE APIMPR
+WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 	aArea		:= GetArea()
 	cBody := ::GetContent()
 	oJson := JsonObject():New()
@@ -37,8 +37,33 @@ WSMETHOD POST GETCHECKOUT WSSERVICE APIMPR
 		dbsetorder(1)
 
 		If dbSeek(filial+prefixo+titulo+parcela+tipo)
-			nSaldo := SaldoTit(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,SE1->E1_TIPO,SE1->E1_NATUREZ,"R",SE1->E1_FORNECE,1,,,SE1->E1_LOJA,,0/*nTxMoeda*/)
+			nSaldo := SaldoTit(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,SE1->E1_TIPO,SE1->E1_NATUREZ,"R",SE1->E1_CLIENTE,1,,,SE1->E1_LOJA,,0/*nTxMoeda*/)
+
+			nTotAbat := SomaAbat(SE1->E1_PREFIXO, SE1->E1_NUM, SE1->E1_PARCELA, "R", SE1->E1_MOEDA, dDataBase, SE1->E1_CLIENTE, SE1->E1_LOJA, xFilial("SE1", SE1->E1_FILORIG), dDataBase, SE1->E1_TIPO)
+
+			//nMulta := LojxRMul( , , ,SE1->E1_SALDO, SE1->E1_ACRESC, SE1->E1_VENCREA, dDataBase, , SE1->E1_MULTA, ,;
+			//					SE1->E1_PREFIXO, SE1->E1_NUM, SE1->E1_PARCELA, SE1->E1_TIPO, SE1->E1_CLIENTE, SE1->E1_LOJA, "SE1" )   	
+
+			//nJuros := faJuros(SE1->E1_VALOR,SE1->E1_SALDO,SE1->E1_VENCTO,SE1->E1_VALJUR,SE1->E1_PORCJUR,SE1->E1_MOEDA,;
+			//SE1->E1_EMISSAO,dDataBase,If(cPaisLoc=="BRA",SE1->E1_TXMOEDA,0),iif( ValType(SE1->E1_BAIXA)=='D', SE1->E1_BAIXA, Stod(SE1->E1_BAIXA)),SE1->E1_VENCREA, "SE1")
+
+			nAtraso := ABS(DateDiffDay( SE1->E1_VENCREA , dDataBase ))
+
+			njuros := 0
+			njuros := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZX"+tipo,"X5_DESCRI"))
+			njuros := Round(SE1->E1_VALOR * njuros/100,2)
+
+			nMulta := 0
+			nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
+			nMulta := Round(SE1->E1_VALOR * nMulta/100,2)
+
+			oJsonCli['valor'] := SE1->E1_VALOR
 			oJsonCli['saldo'] := nSaldo
+			oJsonCli['abatimento'] := nTotAbat
+			oJsonCli['multa'] := nMulta 
+			oJsonCli['juros'] := nJuros * nAtraso
+			oJsonCli['pagar'] := nSaldo + nMulta + (nJuros * nAtraso)
+
 			::SetResponse(oJsonCli:toJSON())
 		ENDIF
 
@@ -46,6 +71,8 @@ WSMETHOD POST GETCHECKOUT WSSERVICE APIMPR
 
 	RestArea(aArea)
 Return(.T.)
+
+
 
 /*
 WSMETHOD GET GETCHECKOUT WSRECEIVE filial,titulo,parcela WSSERVICE APIMPR
