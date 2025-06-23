@@ -5,4 +5,5 @@ export default class PaymentCheckoutResponseDTO {
   tax: number;
   amount: number;
   total: number;
+  pix: string;
 }

@@ -5,4 +5,5 @@ export default class ProtheusCheckoutResponseDTO {
   juros: number;
   valor: number;
   pagar: number;
+  pix: string;
 }

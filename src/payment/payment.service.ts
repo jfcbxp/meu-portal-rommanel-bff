@@ -110,6 +110,7 @@ export class PaymentService {
       tax: result.juros,
       amount: result.valor,
       total: result.pagar,
+      pix: result.pix,
     } as PaymentCheckoutResponseDTO;
   }
 

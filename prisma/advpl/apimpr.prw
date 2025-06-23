@@ -26,7 +26,7 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 	ret := oJson:FromJson(cBody)
 	::SetContentType("application/json")
 
-	filial  := PadR(FWNoAccent(ALLTRIM(oJson['filial'])),TamSX3("E1_FILIAL")[1])
+	cFil  := PadR(FWNoAccent(ALLTRIM(oJson['filial'])),TamSX3("E1_FILIAL")[1])
 	prefixo := PadR(FWNoAccent(ALLTRIM(oJson['prefixo'])),TamSX3("E1_PREFIXO")[1])
 	titulo  := PadR(FWNoAccent(ALLTRIM(oJson['titulo'])),TamSX3("E1_NUM")[1])
 	parcela := PadR(FWNoAccent(ALLTRIM(oJson['parcela'])),TamSX3("E1_PARCELA")[1])
@@ -36,7 +36,8 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 		dbSelectArea('SE1')
 		dbsetorder(1)
 
-		If dbSeek(filial+prefixo+titulo+parcela+tipo)
+		If dbSeek(cFil+prefixo+titulo+parcela+tipo)
+		
 			nSaldo := SaldoTit(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,SE1->E1_TIPO,SE1->E1_NATUREZ,"R",SE1->E1_CLIENTE,1,,,SE1->E1_LOJA,,0/*nTxMoeda*/)
 
 			nTotAbat := SomaAbat(SE1->E1_PREFIXO, SE1->E1_NUM, SE1->E1_PARCELA, "R", SE1->E1_MOEDA, dDataBase, SE1->E1_CLIENTE, SE1->E1_LOJA, xFilial("SE1", SE1->E1_FILORIG), dDataBase, SE1->E1_TIPO)
@@ -57,12 +58,23 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 			nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
 			nMulta := Round(SE1->E1_VALOR * nMulta/100,2)
 
+			pix := ""
+			DbSelectArea( "SM0" )
+			SM0->( DbGoTop() )
+			While SM0->( !Eof() )
+				IF ALLTRIM(SM0->M0_CODFIL)== ALLTRIM(cFil)
+					pix := TransForm(SM0->M0_CGC,"@r 99.999.999/9999-99")
+				Endif
+				SM0->( DbSkip() )
+			End
+
 			oJsonCli['valor'] := SE1->E1_VALOR
 			oJsonCli['saldo'] := nSaldo
 			oJsonCli['abatimento'] := nTotAbat
 			oJsonCli['multa'] := nMulta 
 			oJsonCli['juros'] := nJuros * nAtraso
 			oJsonCli['pagar'] := nSaldo + nMulta + (nJuros * nAtraso)
+			oJsonCli['pix'] := pix
 
 			::SetResponse(oJsonCli:toJSON())
 		ENDIF
@@ -71,7 +83,6 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 
 	RestArea(aArea)
 Return(.T.)
-
 
 
 /*
