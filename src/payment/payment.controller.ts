@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, UseGuards, Query, Post, Body } from '@nestjs/common';
 import { RoleGuard } from 'src/guards/role.guard';
 
 import { PaymentService } from './payment.service';
@@ -22,5 +22,11 @@ export class PaymentController {
     @Query('limit') limit: number = AppConstants.LIMIT_DEFAULT,
   ) {
     return this.paymentService.findAll(user.sub, page, limit, params);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('checkout')
+  createCheckout(@User() user: AuthTokenDTO, @Body() body: any) {
+    return this.paymentService.createCheckout(user.sub, body);
   }
 }
