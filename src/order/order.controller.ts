@@ -13,7 +13,7 @@ export class OrderController {
 
   @UseGuards(AuthGuard)
   @Get()
-  paymentHistory(
+  orderHistory(
     @User() user: AuthTokenDTO,
     @Query('branch') branch: string,
     @Query('document') document: string,
