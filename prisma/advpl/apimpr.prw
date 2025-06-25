@@ -52,11 +52,11 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 
 			njuros := 0
 			njuros := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZX"+tipo,"X5_DESCRI"))
-			njuros := Round(SE1->E1_VALOR * njuros/100,2)
+			njuros := SE1->E1_VALOR * njuros/100
 
 			nMulta := 0
 			nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
-			nMulta := Round(SE1->E1_VALOR * nMulta/100,2)
+			nMulta := SE1->E1_VALOR * nMulta/100
 
 			pix := ""
 			DbSelectArea( "SM0" )
@@ -71,10 +71,11 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 			oJsonCli['valor'] := SE1->E1_VALOR
 			oJsonCli['saldo'] := nSaldo
 			oJsonCli['abatimento'] := nTotAbat
-			oJsonCli['multa'] := nMulta 
-			oJsonCli['juros'] := nJuros * nAtraso
-			oJsonCli['pagar'] := nSaldo + nMulta + (nJuros * nAtraso)
+			oJsonCli['multa'] := Round(nMulta,2)
+			oJsonCli['juros'] := Round(nJuros * nAtraso,2)
+			oJsonCli['pagar'] := Round(nSaldo + nMulta + (nJuros * nAtraso),2)
 			oJsonCli['pix'] := pix
+
 
 			::SetResponse(oJsonCli:toJSON())
 		ENDIF
