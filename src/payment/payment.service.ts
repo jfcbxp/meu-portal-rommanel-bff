@@ -9,12 +9,19 @@ import { PaymentListParamsDto } from './dto/payment-list-params.dto';
 import { FilterStatusEnum } from 'src/enums/filter-status.enum';
 import PaymentGroupResponseDTO from './dto/payment-group-response.dto';
 import { AppConstants } from '@constants/app.constants';
+import { PaymentClient } from './payment.client';
+import PaymentCheckoutRequestDTO from './dto/payment-checkout.request.dto';
+import ProtheusCheckoutRequestDTO from './dto/protheus-checkout.request.dto';
+import PaymentCheckoutResponseDTO from './dto/payment-checkout.response.dto';
 
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly paymentClient: PaymentClient,
+  ) {}
 
   async find(id: number) {
     this.logger.log(`PaymentService.find - Start: ${id}`);
@@ -79,6 +86,34 @@ export class PaymentService {
     };
   }
 
+  async createCheckout(userId: number, request: PaymentCheckoutRequestDTO) {
+    this.logger.log(`PaymentService.createCheckout - Start: ${userId}`);
+
+    const { branch, installment, version, type, document } = request;
+
+    const protheusRequest: ProtheusCheckoutRequestDTO = {
+      filial: branch,
+      parcela: installment,
+      prefixo: version,
+      tipo: type,
+      titulo: document,
+    };
+
+    const result = await this.paymentClient.createCheckout(protheusRequest);
+
+    this.logger.log(`PaymentService.createCheckout - End: ${userId}`);
+
+    return {
+      balance: result.saldo,
+      discount: result.abatimento,
+      fee: result.multa,
+      tax: result.juros,
+      amount: result.valor,
+      total: result.pagar,
+      pix: result.pix,
+    } as PaymentCheckoutResponseDTO;
+  }
+
   private getDays(): PaymentFilterResponseDTO[] {
     return Object.values(FilterDaysEnum).map((value) => ({
       code: value,
@@ -139,9 +174,8 @@ export class PaymentService {
   }
 
   private getGroupDescription(groupId: string) {
-    // Espera groupId no formato "dd/MM/yyyy"
     const [day, month, year] = groupId.split('/').map(Number);
-    const baseDate = new Date(year, month - 1, day); // mês começa em 0
+    const baseDate = new Date(year, month - 1, day);
 
     const dayStr = baseDate.getDate().toString().padStart(2, '0');
     const monthStr = baseDate
