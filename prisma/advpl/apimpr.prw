@@ -55,7 +55,7 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 			njuros := nSaldo * njuros/100
 
 			nMulta := 0
-			IF ABS(SE1->E1_VALOR - nSaldo) >= 50
+			IF ABS(SE1->E1_VALOR - nSaldo) < 50
 				nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
 				nMulta := nSaldo * nMulta/100
 			ENDIF
