@@ -52,12 +52,13 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 
 			njuros := 0
 			njuros := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZX"+tipo,"X5_DESCRI"))
-			njuros := SE1->E1_VALOR * njuros/100
+			njuros := nSaldo * njuros/100
 
 			nMulta := 0
-			nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
-			nMulta := SE1->E1_VALOR * nMulta/100
-
+			IF ABS(SE1->E1_VALOR - nSaldo) < 50
+				nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
+				nMulta := nSaldo * nMulta/100
+			ENDIF
 			pix := ""
 			DbSelectArea( "SM0" )
 			SM0->( DbGoTop() )
