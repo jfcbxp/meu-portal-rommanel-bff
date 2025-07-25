@@ -50,15 +50,23 @@ WSMETHOD POST CHECKOUT WSSERVICE APIMPR
 
 			nAtraso := ABS(DateDiffDay( SE1->E1_VENCREA , dDataBase ))
 
-			njuros := 0
-			njuros := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZX"+tipo,"X5_DESCRI"))
-			njuros := nSaldo * njuros/100
 
+			njuros := 0
 			nMulta := 0
-			IF ABS(SE1->E1_VALOR - nSaldo) < 50
-				nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
-				nMulta := nSaldo * nMulta/100
+
+			IF SE1->E1_VENCREA < dDataBase
+				njuros := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZX"+tipo,"X5_DESCRI"))
+				njuros := nSaldo * njuros/100
+
+				IF ABS(SE1->E1_VALOR - nSaldo) < 50
+					nMulta := VAL(POSICIONE("SX5",1,XFILIAL("SX5")+"ZY"+tipo,"X5_DESCRI"))  
+					nMulta := nSaldo * nMulta/100
+				ENDIF
+				
 			ENDIF
+
+
+
 			pix := ""
 			DbSelectArea( "SM0" )
 			SM0->( DbGoTop() )
