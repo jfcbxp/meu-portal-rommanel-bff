@@ -39,13 +39,18 @@ export class PaymentClient {
       const url = `${process.env.PROTHEUS_URL}/APIMPR/v1/checkout`;
 
       const response = firstValueFrom(
-        this.httpService.post<ProtheusCheckoutResponseDTO>(url, request, { timeout: 60000 }).pipe(
-          map((res: AxiosResponse<ProtheusCheckoutResponseDTO>) => res.data),
-          catchError((error) => {
-            this.logger.error(`PaymentClient.createCheckout - Error checkout [${error}]`);
-            throw new InternalServerErrorException();
-          }),
-        ),
+        this.httpService
+          .post<ProtheusCheckoutResponseDTO>(url, request, {
+            timeout: 60000,
+            auth: { username: process.env.PROTHEUS_USER || 'api', password: process.env.PROTHEUS_PASS || 'api' },
+          })
+          .pipe(
+            map((res: AxiosResponse<ProtheusCheckoutResponseDTO>) => res.data),
+            catchError((error) => {
+              this.logger.error(`PaymentClient.createCheckout - Error checkout [${error}]`);
+              throw new InternalServerErrorException();
+            }),
+          ),
       );
 
       this.logger.log('PaymentClient.createCheckout - End');
